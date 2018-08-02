@@ -155,17 +155,21 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
  */
 createReviewHTML = (review) => {
   const li = document.createElement('li');
-  const name = document.createElement('p');
+  const reviewMeta = document.createElement('div');
+  reviewMeta.className = 'review-meta';
+  li.appendChild(reviewMeta);
+  
+  const name = document.createElement('h3');
   name.innerHTML = review.name;
-  li.appendChild(name);
-
+  reviewMeta.appendChild(name);
+  
   const date = document.createElement('p');
   date.innerHTML = review.date;
-  li.appendChild(date);
+  reviewMeta.appendChild(date);
 
   const rating = document.createElement('p');
   rating.innerHTML = `Rating: ${review.rating}`;
-  li.appendChild(rating);
+  reviewMeta.appendChild(rating);
 
   const comments = document.createElement('p');
   comments.innerHTML = review.comments;
@@ -180,8 +184,18 @@ createReviewHTML = (review) => {
 fillBreadcrumb = (restaurant=self.restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
-  li.innerHTML = restaurant.name;
-  breadcrumb.appendChild(li);
+  const breadcrumbLink = document.createElement('a');
+  const breadcrumbList = breadcrumb.getElementsByTagName('ol')[0];
+  const breadcrumbItems = breadcrumbList.getElementsByTagName('li');
+  
+  breadcrumbList.appendChild(li);
+  li.appendChild(breadcrumbLink);
+  breadcrumbLink.innerHTML = restaurant.name;
+  
+  const lastItem = breadcrumbList.getElementsByTagName('li')[breadcrumbList.getElementsByTagName('li').length - 1];
+    
+  lastItem.children[0].href = window.location;
+  lastItem.children[0].setAttribute('aria-current', 'page');
 };
 
 /**

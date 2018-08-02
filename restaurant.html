@@ -14,26 +14,20 @@
 <body class="inside">
   <!-- Beginning header -->
   <header>
-    <!-- Beginning nav -->
-    <nav>
-      <h1><a href="/">Restaurant Reviews</a></h1>
-    </nav>
+    <h1><a href="/">Restaurant Reviews</a></h1>
+
     <!-- Beginning breadcrumb -->
-    <ul id="breadcrumb" >
-      <li><a href="/">Home</a></li>
-    </ul>
+    <nav aria-label="Breadcrumb" id="breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+      </ol>
+    </nav>
     <!-- End breadcrumb -->
-    <!-- End nav -->
   </header>
   <!-- End header -->
 
   <!-- Beginning main -->
   <main id="main-content">
-    <!-- Beginning map -->
-    <section id="map-container">
-      <div id="map"></div>
-    </section>
-    <!-- End map -->
     <!-- Beginning restaurant -->
     <section id="restaurant-container">
       <h2 id="restaurant-name"></h2>
@@ -43,6 +37,11 @@
       <table id="restaurant-hours"></table>
     </section>
     <!-- end restaurant -->
+    <!-- Beginning map -->
+    <section id="map-container">
+      <div id="map" role="application"></div>
+    </section>
+    <!-- End map -->
     <!-- Beginning reviews -->
     <section id="reviews-container">
       <ul id="reviews-list"></ul>

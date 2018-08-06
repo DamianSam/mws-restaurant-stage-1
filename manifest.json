@@ -1,0 +1,6 @@
+{
+  "name": "Restaurant Reviews App",
+  "description": "Check the reviews of the retaurants in your neighborhood",
+  "display": "standalone",
+  "start_url": "/"
+}

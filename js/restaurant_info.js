@@ -88,13 +88,14 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const image = document.getElementById('restaurant-img');
   const imageUrl = DBHelper.imageUrlForRestaurant(restaurant);
-  const fileName = imageUrl.split('.').slice(0, -1).join('.');
-  const fileExtension = imageUrl.split('.').pop();
+  // const fileName = imageUrl.split('.').slice(0, -1).join('.');
+  // const fileExtension = imageUrl.split('.').pop();
+  const fileExtension = 'jpg';
   image.className = 'restaurant-img';
   image.alt = 'Interior of ' + restaurant.name;
-  image.src = fileName + '-440w.' + fileExtension;
+  image.src = imageUrl + '-440w.' + fileExtension;
   image.width = '440';
-  image.srcset = fileName + '-320w.' + fileExtension + ' 320w, ' + fileName + '-440w.' + fileExtension + ' 440w, ' + fileName + '.' + fileExtension + ' 800w';
+  image.srcset = imageUrl + '-320w.' + fileExtension + ' 320w, ' + imageUrl + '-440w.' + fileExtension + ' 440w, ' + imageUrl + '.' + fileExtension + ' 800w';
   image.sizes = '(max-width: 500px) 440px, (max-width: 1024px) 600px, 100vw';
 
   const cuisine = document.getElementById('restaurant-cuisine');

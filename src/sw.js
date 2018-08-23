@@ -1,4 +1,12 @@
-const staticCacheName = 'restaurant-app-v2';
+if (typeof idb === 'undefined') {
+  self.importScripts('assets/static/js/idb.js');
+}
+
+const staticCacheName = 'restaurant-app-v3';
+
+const dbPromise = idb.open('mws-restaurant-db', 1, upgradeDB => {
+  let dbStore = upgradeDB.createObjectStore('restaurants', { keyPath: 'id' });
+});
 
 /**
  * Install Service Worker and cache assets
@@ -9,35 +17,34 @@ self.addEventListener('install', event => {
       return cache.addAll([
         '/',
         '/restaurant.html',
-        '/css/styles.css',
-        '/data/restaurants.json',
-        '/js/main.js',
-        '/js/restaurant_info.js',
-        '/js/dbhelper.js',
-        '/img/1.jpg',
-        '/img/1-440w.jpg',
-        '/img/2.jpg',
-        '/img/2-440w.jpg',
-        '/img/3.jpg',
-        '/img/3-440w.jpg',
-        '/img/4.jpg',
-        '/img/4-440w.jpg',
-        '/img/5.jpg',
-        '/img/5-440w.jpg',
-        '/img/6.jpg',
-        '/img/6-440w.jpg',
-        '/img/7.jpg',
-        '/img/7-440w.jpg',
-        '/img/8.jpg',
-        '/img/8-440w.jpg',
-        '/img/9.jpg',
-        '/img/9-440w.jpg',
-        '/img/10.jpg',
-        '/img/10-440w.jpg'
+        '/assets/css/styles.css',
+        '/assets/static/js/main.js',
+        '/assets/static/js/restaurant_info.js',
+        '/assets/static/js/dbhelper.js',
+        '/assets/img/1.jpg',
+        '/assets/img/1-440w.jpg',
+        '/assets/img/2.jpg',
+        '/assets/img/2-440w.jpg',
+        '/assets/img/3.jpg',
+        '/assets/img/3-440w.jpg',
+        '/assets/img/4.jpg',
+        '/assets/img/4-440w.jpg',
+        '/assets/img/5.jpg',
+        '/assets/img/5-440w.jpg',
+        '/assets/img/6.jpg',
+        '/assets/img/6-440w.jpg',
+        '/assets/img/7.jpg',
+        '/assets/img/7-440w.jpg',
+        '/assets/img/8.jpg',
+        '/assets/img/8-440w.jpg',
+        '/assets/img/9.jpg',
+        '/assets/img/9-440w.jpg',
+        '/assets/img/10.jpg',
+        '/assets/img/10-440w.jpg'
       ])
     })
   );
-}); 
+});
 
 /**
  * Activate Service Worker and refresh cache
@@ -47,7 +54,7 @@ self.addEventListener('activate', event => {
     caches.keys().then( cacheNames => {
       return Promise.all(
         cacheNames.filter( cacheName => {
-          return cacheName.startsWith('restaurant-app-') && 
+          return cacheName.startsWith('restaurant-app-') &&
                  cacheName != staticCacheName;
         }).map( cacheName => {
           return caches.delete(cacheName);
@@ -69,7 +76,7 @@ self.addEventListener('fetch', event => {
       event.respondWith(caches.match('/'));
       return;
     }
-    
+
     if ( url.pathname.startsWith( '/restaurant.html' ) ) {
       event.respondWith(caches.match('/restaurant.html'));
       return;

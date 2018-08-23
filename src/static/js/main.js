@@ -9,7 +9,7 @@ var markers = []
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   registerSW();
-  initMap(); // added 
+  initMap(); // added
   fetchNeighborhoods();
   fetchCuisines();
 });
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
  */
 registerSW = () => {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('js/sw.js')
+    navigator.serviceWorker.register('sw.js')
     .then(response => {
       console.log('Successful Registration of SW.', response);
     }).catch(error => {
@@ -173,11 +173,12 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
   const image = document.createElement('img');
-  const imageUrl = DBHelper.imageUrlForRestaurant(restaurant);
-  //const fileName = imageUrl.split('.').slice(0, -1).join('.');
-  //const fileExtension = imageUrl.split('.').pop();
+  const assetsFolder = 'assets';
+  const imageUrl = assetsFolder + DBHelper.imageUrlForRestaurant(restaurant);
+  // const fileName = imageUrl.split('.').slice(0, -1).join('.');
+  // const fileExtension = imageUrl.split('.').pop();
   const fileExtension = 'jpg';
-  
+
   image.className = 'restaurant-img';
   image.src = imageUrl + '-440w.' + fileExtension;
   image.width = '440';
@@ -220,7 +221,7 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 
-} 
+}
 /* addMarkersToMap = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     // Add marker to the map
@@ -231,4 +232,3 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 } */
-

@@ -4,7 +4,7 @@ var newMap;
 /**
  * Initialize map as soon as the page is loaded.
  */
-document.addEventListener('DOMContentLoaded', (event) => {  
+document.addEventListener('DOMContentLoaded', (event) => {
   initMap();
 });
 
@@ -15,7 +15,7 @@ initMap = () => {
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
       console.error(error);
-    } else {      
+    } else {
       self.newMap = L.map('map', {
         center: [restaurant.latlng.lat, restaurant.latlng.lng],
         zoom: 16,
@@ -27,14 +27,14 @@ initMap = () => {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
           '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
           'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        id: 'mapbox.streets'    
+        id: 'mapbox.streets'
       }).addTo(newMap);
       fillBreadcrumb();
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
     }
   });
 };
- 
+
 /* window.initMap = () => {
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
@@ -87,7 +87,8 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   address.innerHTML = restaurant.address;
 
   const image = document.getElementById('restaurant-img');
-  const imageUrl = DBHelper.imageUrlForRestaurant(restaurant);
+  const assetsFolder = 'assets';
+  const imageUrl = assetsFolder + DBHelper.imageUrlForRestaurant(restaurant);
   // const fileName = imageUrl.split('.').slice(0, -1).join('.');
   // const fileExtension = imageUrl.split('.').pop();
   const fileExtension = 'jpg';
@@ -159,11 +160,11 @@ createReviewHTML = (review) => {
   const reviewMeta = document.createElement('div');
   reviewMeta.className = 'review-meta';
   li.appendChild(reviewMeta);
-  
+
   const name = document.createElement('h3');
   name.innerHTML = review.name;
   reviewMeta.appendChild(name);
-  
+
   const date = document.createElement('p');
   date.innerHTML = review.date;
   reviewMeta.appendChild(date);
@@ -188,13 +189,13 @@ fillBreadcrumb = (restaurant=self.restaurant) => {
   const breadcrumbLink = document.createElement('a');
   const breadcrumbList = breadcrumb.getElementsByTagName('ol')[0];
   const breadcrumbItems = breadcrumbList.getElementsByTagName('li');
-  
+
   breadcrumbList.appendChild(li);
   li.appendChild(breadcrumbLink);
   breadcrumbLink.innerHTML = restaurant.name;
-  
+
   const lastItem = breadcrumbList.getElementsByTagName('li')[breadcrumbList.getElementsByTagName('li').length - 1];
-    
+
   lastItem.children[0].href = window.location;
   lastItem.children[0].setAttribute('aria-current', 'page');
 };

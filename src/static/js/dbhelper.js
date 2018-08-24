@@ -178,3 +178,31 @@ class DBHelper {
   } */
 
 }
+
+/**
+ * Add restaurants db
+ */
+const dbPromise = idb.open('mws-restaurant-db', 1, upgradeDB => {
+  const dbStore = upgradeDB.createObjectStore('restaurants', {
+    keyPath: 'id'
+  });
+  dbStore.createIndex('by-name', 'name');
+});
+
+dbPromise.then(db => {
+  if (!db) return;
+
+  DBHelper.fetchRestaurants((error, restaurants) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      const tx = db.transaction('restaurants', 'readwrite');
+      const dbStore = tx.objectStore('restaurants');
+      const nameIndex = dbStore.index('by-name');
+
+      restaurants.forEach(restaurant => {
+        dbStore.put(restaurant);
+      });
+    }
+  });
+});

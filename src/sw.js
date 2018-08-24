@@ -1,12 +1,4 @@
-if (typeof idb === 'undefined') {
-  self.importScripts('assets/static/js/idb.js');
-}
-
-const staticCacheName = 'restaurant-app-v3';
-
-const dbPromise = idb.open('mws-restaurant-db', 1, upgradeDB => {
-  let dbStore = upgradeDB.createObjectStore('restaurants', { keyPath: 'id' });
-});
+const staticCacheName = 'restaurant-app-v4';
 
 /**
  * Install Service Worker and cache assets
@@ -51,17 +43,14 @@ self.addEventListener('install', event => {
  */
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then( cacheNames => {
-      return Promise.all(
-        cacheNames.filter( cacheName => {
-          return cacheName.startsWith('restaurant-app-') &&
-                 cacheName != staticCacheName;
-        }).map( cacheName => {
-          return caches.delete(cacheName);
-        })
-      );
-    })
-  );
+    caches.keys().then(cacheNames => {
+      return Promise.all(cacheNames.filter(cacheName => {
+        return cacheName.startsWith('restaurant-app-') &&
+                 cacheName !== staticCacheName;
+      }).map(cacheName => {
+        return caches.delete(cacheName);
+      }));
+    }));
 });
 
 
@@ -71,21 +60,25 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  if ( url.origin === location.origin ) {
-    if ( url.pathname === '/' ) {
+  if (url.origin === location.origin) {
+    if (url.pathname === '/') {
       event.respondWith(caches.match('/'));
       return;
     }
 
-    if ( url.pathname.startsWith( '/restaurant.html' ) ) {
+    if (url.pathname.startsWith('/restaurant.html')) {
       event.respondWith(caches.match('/restaurant.html'));
       return;
     }
   }
 
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
-  );
+    caches.open(staticCacheName).then(cache => {
+      return caches.match(event.request).then(response => {
+        return response || fetch(event.request).then(response => {
+          cache.put(event.request, response.clone());
+          return response;
+        });
+      })
+    }));
 });

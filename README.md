@@ -1,5 +1,21 @@
 # Mobile Web Specialist Certification Course
----
+### :closed_book: Recommendations
+Make sure you have the following installed: 
+* [Node.js](https://nodejs.org/)
+* [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/en/)
+  
+**Recommended to use node 8.9.* ([last LTS version](https://github.com/nodejs/Release#release-schedule))**
+### :dart: Static templating
+#### Step 1 - clone this repo
+```bash
+git clone https://github.com/DamianSam/mws-restaurant-stage-1.git <my-project-name>
+cd <my-project-name>
+```
+#### Step 2 - run
+```bash
+yarn
+yarn start
+```
 #### _Three Stage Course Material Project - Restaurant Reviews_
 
 ## Project Overview: Stage 1
@@ -27,6 +43,3 @@ This repository uses [leafletjs](https://leafletjs.com/) with [Mapbox](https://w
 ### Note about ES6
 
 Most of the code in this project has been written to the ES6 JavaScript specification for compatibility with modern web browsers and future proofing JavaScript code. As much as possible, try to maintain use of ES6 in any additional JavaScript you write. 
-
-
-

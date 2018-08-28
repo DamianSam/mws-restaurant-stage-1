@@ -1,3 +1,4 @@
+/* eslint-disable */
 let restaurants,
   neighborhoods,
   cuisines
@@ -9,9 +10,9 @@ var markers = []
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   registerSW();
-  initMap(); // added
   fetchNeighborhoods();
   fetchCuisines();
+  initMap(); // added
 });
 
 /**
@@ -202,10 +203,42 @@ createRestaurantHTML = (restaurant) => {
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
-  li.append(more)
+  li.append(more);
+
+  // Favorite button functionality
+  const fav = document.createElement('button');
+  let favAddText = 'Add to Favorites ☆';
+  let favRemoveText = 'Remove from Favorites ★';
+
+  fav.innerHTML = favAddText;
+  fav.className = 'favorite';
+
+  fav.addEventListener('click', function () {
+    fav.classList.toggle('is-fav')
+    favSwitcher(restaurant, fav);
+  });
+  favSwitcher(restaurant, fav);
+  li.append(fav);
 
   return li
 }
+
+favSwitcher = (restaurant, el) => {
+  let favAddText = 'Add to Favorites ☆';
+  let favRemoveText = 'Remove from Favorites ★';
+
+  if (restaurant.is_favorite && String(restaurant.is_favorite) !== 'false') {
+    restaurant.is_favorite = false;
+    el.classList.remove('is-fav');
+    el.innerHTML = favAddText;
+  } else {
+    restaurant.is_favorite = true;
+    el.classList.add('is-fav');
+    el.innerHTML = favRemoveText;
+  }
+  DBHelper.favUpdate(restaurant);
+}
+
 
 /**
  * Add markers for current restaurants to the map.

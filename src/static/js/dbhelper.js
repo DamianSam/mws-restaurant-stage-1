@@ -1,6 +1,9 @@
+/* eslint-disable */
+
 /**
  * Common database helper functions.
  */
+
 class DBHelper {
 
   /**
@@ -12,18 +15,60 @@ class DBHelper {
     return `http://localhost:${port}/restaurants`;
   }
 
+  static createDb() {
+    return idb.open('mws-restaurant-db', 3, upgradeDB => {
+      switch (upgradeDB.oldVersion) {
+        case 0:
+          upgradeDB.createObjectStore('restaurants', {
+            keyPath: 'id'
+          });
+        case 1:
+          const reviewsStore = upgradeDB.createObjectStore('reviews', {
+            keyPath: 'id'
+          });
+          reviewsStore.createIndex('restaurant', 'restaurant_id');
+      }
+    });
+  }
+
+  static dbPromise() {
+    return DBHelper.createDb();
+  }
+
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    fetch(DBHelper.DATABASE_URL).then(response => {
-      return response.json();
-    }).then(responseText => {
-      const restaurants = responseText;
-      callback(null, restaurants);
+    fetch(DBHelper.DATABASE_URL).then(response => response.json()).then(data => {
+      DBHelper.updateIDB(data);
+      return callback(null, data);
     }).catch(error => {
-      const errorLog = (`Request failed. Returned status of ${error.message}`);
-      callback(errorLog, null);
+      DBHelper.createDb().then(db => {
+        let tx = db.transaction('restaurants', 'readwrite');
+        let dbStore = tx.objectStore('restaurants');
+        return dbStore.getAll();
+      })
+      .then(data => {
+        if (data.length) {
+          callback(null, data);
+        } else {
+          callback(error, null);
+        }
+      })
+    })
+  }
+
+  /**
+   * Update indexDB
+   */
+  static updateIDB(data) {
+    DBHelper.createDb().then(db => {
+      let tx = db.transaction('restaurants', 'readwrite');
+      let dbStore = tx.objectStore('restaurants');
+      data.forEach(restaurant => {
+        dbStore.put(restaurant);
+      });
+      tx.complete.catch(() => console.log('Error'))
     });
   }
 
@@ -166,43 +211,25 @@ class DBHelper {
       marker.addTo(newMap);
     return marker;
   }
-  /* static mapMarkerForRestaurant(restaurant, map) {
-    const marker = new google.maps.Marker({
-      position: restaurant.latlng,
-      title: restaurant.name,
-      url: DBHelper.urlForRestaurant(restaurant),
-      map: map,
-      animation: google.maps.Animation.DROP}
-    );
-    return marker;
-  } */
+
+  /**
+   * Favorite button.
+   */
+   static favUpdate(restaurant) {
+     const url = `${DBHelper.DATABASE_URL}/${restaurant.id}/?is_favorite=${restaurant.is_favorite}`;
+     return fetch(url, {
+         method: 'PUT'
+       })
+       .then(() => {
+         this.dbPromise().then(idb => {
+           const tx = idb.transaction('restaurants', 'readwrite');
+           const dbStore = tx.objectStore('restaurants');
+           dbStore.get(restaurant.id).then(r => {
+             r.is_favorite = restaurant.is_favorite;
+             dbStore.put(r);
+           });
+         });
+       });
+   }
 
 }
-
-/**
- * Add restaurants db
- */
-const dbPromise = idb.open('mws-restaurant-db', 1, upgradeDB => {
-  const dbStore = upgradeDB.createObjectStore('restaurants', {
-    keyPath: 'id'
-  });
-  dbStore.createIndex('by-name', 'name');
-});
-
-dbPromise.then(db => {
-  if (!db) return;
-
-  DBHelper.fetchRestaurants((error, restaurants) => {
-    if (error) {
-      callback(error, null);
-    } else {
-      const tx = db.transaction('restaurants', 'readwrite');
-      const dbStore = tx.objectStore('restaurants');
-      const nameIndex = dbStore.index('by-name');
-
-      restaurants.forEach(restaurant => {
-        dbStore.put(restaurant);
-      });
-    }
-  });
-});

@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 let restaurant;
 var newMap;
 

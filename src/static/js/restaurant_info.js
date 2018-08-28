@@ -7,8 +7,23 @@ var newMap;
  * Initialize map as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
+  registerSW();
   initMap();
 });
+
+/**
+ * Register Service Worker
+ */
+registerSW = () => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+    .then(response => {
+      console.log('Successful Registration of SW.', response);
+    }).catch(error => {
+      console.log('Registration of SW failed: ', error);
+    });
+  }
+}
 
 /**
  * Initialize leaflet map
@@ -210,18 +225,72 @@ reviewForm.addEventListener('submit', (e) => {
   confirm.innerHTML = 'Thank you!';
   reviewForm.appendChild(confirm);
 
-  DBHelper.reviewFormSubmit(review, (error, review) => {
-    const ul = document.getElementById('reviews-list');
-    ul.appendChild(createReviewHTML(review));
-    reviewForm.reset();
+  if (!navigator.onLine) {
+    const networkStatus = document.createElement('p');
+    networkStatus.className = 'network-status';
+
+    networkStatus.innerHTML = 'Oh no, you are offline!';
+
+    setTimeout( () => {
+      networkStatus.remove();
+    }, 6000);
+
+    reviewForm.appendChild(networkStatus);
+  }
+
+  if (navigator.onLine) {
+    DBHelper.reviewFormSubmit(review, (error, review) => {
+      const ul = document.getElementById('reviews-list');
+      ul.appendChild(createReviewHTML(review));
+      reviewForm.reset();
+      setTimeout( () => {
+        confirm.remove();
+      }, 3000);
+      DBHelper.storeReviewWhenForm(review);
+    });
+  } else {
+    console.log("offline!");
     setTimeout( () => {
       confirm.remove();
-    }, 5000);
-    DBHelper.storeReviewWhenForm(review);
-  });
+    }, 2000);
 
+    if (JSON.parse(localStorage.getItem('getOffReviews'))) {
+      getOffReviews = JSON.parse(localStorage.getItem('getOffReviews'));
+    } else {
+      getOffReviews = [];
+    }
+
+    getOffReviews.push(review);
+    localStorage.setItem('getOffReviews', JSON.stringify(getOffReviews));
+  }
 });
 
+window.addEventListener('online', () => {
+  const networkStatus = document.createElement('p');
+  networkStatus.className = 'network-status';
+  networkStatus.classList.add('is-online');
+  networkStatus.innerHTML = 'Yaay, you are back online!';
+
+  setTimeout( () => {
+    networkStatus.remove();
+  }, 3000);
+  reviewForm.appendChild(networkStatus);
+
+  let getOffReviews = [];
+  getOffReviews = JSON.parse(localStorage.getItem('getOffReviews'));
+  if (getOffReviews !== undefined || getOffReviews.length !== 0) {
+    getOffReviews.forEach(review => {
+      DBHelper.reviewFormSubmit(review, (error, review) => {
+        const ul = document.getElementById('reviews-list');
+        ul.appendChild(createReviewHTML(review));
+        reviewForm.reset();
+        DBHelper.storeReviewWhenForm(review);
+      });
+    });
+  }
+  getOffReviews = [];
+  localStorage.setItem('getOffReviews', JSON.stringify(getOffReviews));
+});
 
 /**
  * Add restaurant name to the breadcrumb navigation menu

@@ -46,6 +46,7 @@ gulp.task('css', () =>
       sourceMap: true,
       errLogToConsole: true,
     }))
+    .pipe(minify({ compatibility: 'ie8' }))
 
     /**
      * You can use this feature if you have a lot of vendor css/scss libs.

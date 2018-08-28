@@ -226,7 +226,7 @@ class DBHelper {
        method: 'PUT'
      })
      .then(() => {
-       this.dbPromise().then(idb => {
+       DBHelper.dbPromise().then(idb => {
          const tx = idb.transaction('restaurants', 'readwrite');
          const dbStore = tx.objectStore('restaurants');
          dbStore.get(restaurant.id).then(restaurantFav => {
@@ -249,9 +249,19 @@ class DBHelper {
       const tx = idb.transaction('reviews', 'readwrite');
       const revStore = tx.objectStore('reviews');
       return Promise.all(reviews.map(review => revStore.put(review)))
-        .catch(() => {
-          tx.abort();
-        });
+        .catch(() => {tx.abort(); });
+    });
+  }
+
+  /**
+  * Store review when form is submitted.
+  */
+  static storeReviewWhenForm(review) {
+    return DBHelper.dbPromise().then(idb => {
+      const tx = idb.transaction('reviews', 'readwrite');
+      const revStore = tx.objectStore('reviews');
+      revStore.put(review);
+      return tx.complete.catch(() => console.log('Error'));
     });
   }
 
@@ -300,5 +310,22 @@ class DBHelper {
         });
         console.log('Something went wrong: ' + error);
       });
+  }
+
+  /**
+  * Reviews form submission.
+  */
+  static reviewFormSubmit(review, callback) {
+    const url = `${DBHelper.REVIEWS_URL}`;
+    fetch(url, {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(review)
+    }).then(revSub => revSub.json()).then(revSub => {
+      callback(null, revSub);
+    });
   }
 }

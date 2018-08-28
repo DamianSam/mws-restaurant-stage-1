@@ -514,6 +514,8 @@ form {
     background-color: #fff;
     border-radius: 4px;
     width: 100%;
+    padding: 0 10px;
+    font-size: 12px;
 
     @media (min-width: 768px) {
       width: 60%;
@@ -527,12 +529,14 @@ form {
 
   textarea {
     min-height: 100px;
+    padding: 10px;
   }
 
   button {
     background-color: orange;
     border-width: 0;
     border-bottom: 3px solid darken(orange, 5%);
+    cursor: pointer;
     color: #fff;
     font-size: 16px;
     border-radius: 4px;

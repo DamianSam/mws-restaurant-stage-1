@@ -153,7 +153,6 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
       ul.appendChild(createReviewHTML(review));
     });
     container.appendChild(ul);
-    console.log('Something went wrong: ' + error);
   });
 };
 
@@ -189,6 +188,40 @@ createReviewHTML = (review) => {
 
   return li;
 };
+
+/**
+ * Review form.
+ */
+const reviewForm = document.getElementById('review-form');
+reviewForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  let form = new FormData(e.target);
+  let name = form.get('Name');
+  let rating = form.get('Rating');
+  let comments = form.get('form-review-content');
+  let restaurant_id = self.restaurant.id;
+  const review = {
+    name,
+    rating,
+    comments,
+    restaurant_id,
+  };
+  const confirm = document.createElement('p');
+  confirm.innerHTML = 'Thank you!';
+  reviewForm.appendChild(confirm);
+
+  DBHelper.reviewFormSubmit(review, (error, review) => {
+    const ul = document.getElementById('reviews-list');
+    ul.appendChild(createReviewHTML(review));
+    reviewForm.reset();
+    setTimeout( () => {
+      confirm.remove();
+    }, 5000);
+    DBHelper.storeReviewWhenForm(review);
+  });
+
+});
+
 
 /**
  * Add restaurant name to the breadcrumb navigation menu

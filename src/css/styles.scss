@@ -418,7 +418,8 @@ header h1 a {
 }
 
 #restaurant-container,
-#reviews-container {
+#reviews-container,
+#reviews-form-container {
   border-bottom: 1px solid #d9d9d9;
   border-top: 1px solid #fff;
   padding: 20px;
@@ -426,7 +427,8 @@ header h1 a {
 
 @media (min-width: 768px) {
   #restaurant-container,
-  #reviews-container {
+  #reviews-container,
+  #reviews-form-container {
     width: 50%;
     padding: 140px 40px 40px;
   }
@@ -442,17 +444,20 @@ header h1 a {
   }
 }
 
-#reviews-container {
+#reviews-container,
+#reviews-form-container {
   padding: 30px 20px 0;
 }
 
 @media (min-width: 768px) {
-  #reviews-container {
+  #reviews-container,
+  #reviews-form-container  {
     padding: 30px 40px 80px;
   }
 }
 
-#reviews-container h2 {
+#reviews-container h2,
+#reviews-form-container h2 {
   color: #f58500;
   font-size: 24pt;
   font-weight: 300;
@@ -489,4 +494,58 @@ header h1 a {
 
 #restaurant-hours td {
   color: #666;
+}
+
+form {
+  label {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+
+  .fields {
+    margin-bottom: 20px;
+  }
+
+  input,
+  select,
+  textarea {
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 4px;
+    width: 100%;
+
+    @media (min-width: 768px) {
+      width: 60%;
+    }
+  }
+
+  input,
+  select {
+    height: 40px;
+  }
+
+  textarea {
+    min-height: 100px;
+  }
+
+  button {
+    background-color: orange;
+    border-width: 0;
+    border-bottom: 3px solid darken(orange, 5%);
+    color: #fff;
+    font-size: 16px;
+    border-radius: 4px;
+    width: 100%;
+    height: 40px;
+
+    @media (min-width: 768px) {
+      width: 60%;
+    }
+
+    &:hover {
+      background-color: darken(orange, 5%);
+      border-bottom: 3px solid lighten(orange, 5%);
+    }
+  }
 }

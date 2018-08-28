@@ -136,22 +136,25 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  * Create all reviews HTML and add them to the webpage.
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
-  const container = document.getElementById('reviews-container');
-  const title = document.createElement('h2');
-  title.innerHTML = 'Reviews';
-  container.appendChild(title);
+  DBHelper.fetchReviewsById(self.restaurant.id, (error, reviews) => {
+    const container = document.getElementById('reviews-container');
+    const title = document.createElement('h2');
+    title.innerHTML = 'Reviews';
+    container.appendChild(title);
 
-  if (!reviews) {
-    const noReviews = document.createElement('p');
-    noReviews.innerHTML = 'No reviews yet!';
-    container.appendChild(noReviews);
-    return;
-  }
-  const ul = document.getElementById('reviews-list');
-  reviews.forEach(review => {
-    ul.appendChild(createReviewHTML(review));
+    if (!reviews) {
+      const noReviews = document.createElement('p');
+      noReviews.innerHTML = 'No reviews yet!';
+      container.appendChild(noReviews);
+      return;
+    }
+    const ul = document.getElementById('reviews-list');
+    reviews.forEach(review => {
+      ul.appendChild(createReviewHTML(review));
+    });
+    container.appendChild(ul);
+    console.log('Something went wrong: ' + error);
   });
-  container.appendChild(ul);
 };
 
 /**
@@ -168,7 +171,12 @@ createReviewHTML = (review) => {
   reviewMeta.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  const createdDate = new Date(review.createdAt);
+  const createdDay = createdDate.getDate();
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const createdMonth = months[createdDate.getMonth()];
+  const createdYear = createdDate.getFullYear();
+  date.innerHTML = `Added: ` + `${createdDay} ${createdMonth} ${createdYear}`;
   reviewMeta.appendChild(date);
 
   const rating = document.createElement('p');

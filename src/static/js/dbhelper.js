@@ -15,6 +15,11 @@ class DBHelper {
     return `http://localhost:${port}/restaurants`;
   }
 
+  static get REVIEWS_URL() {
+    const port = 1337; // Change this to your server port
+    return `http://localhost:${port}/reviews`;
+  }
+
   static createDb() {
     return idb.open('mws-restaurant-db', 3, upgradeDB => {
       switch (upgradeDB.oldVersion) {
@@ -215,21 +220,85 @@ class DBHelper {
   /**
    * Favorite button.
    */
-   static favUpdate(restaurant) {
-     const url = `${DBHelper.DATABASE_URL}/${restaurant.id}/?is_favorite=${restaurant.is_favorite}`;
-     return fetch(url, {
-         method: 'PUT'
-       })
-       .then(() => {
-         this.dbPromise().then(idb => {
-           const tx = idb.transaction('restaurants', 'readwrite');
-           const dbStore = tx.objectStore('restaurants');
-           dbStore.get(restaurant.id).then(r => {
-             r.is_favorite = restaurant.is_favorite;
-             dbStore.put(r);
-           });
+  static favUpdate(restaurant) {
+   const url = `${DBHelper.DATABASE_URL}/${restaurant.id}/?is_favorite=${restaurant.is_favorite}`;
+   return fetch(url, {
+       method: 'PUT'
+     })
+     .then(() => {
+       this.dbPromise().then(idb => {
+         const tx = idb.transaction('restaurants', 'readwrite');
+         const dbStore = tx.objectStore('restaurants');
+         dbStore.get(restaurant.id).then(restaurantFav => {
+           restaurantFav.is_favorite = restaurant.is_favorite;
+           dbStore.put(restaurantFav);
          });
        });
-   }
+     });
+  }
 
+  /****
+  ** REVIEWS
+  **/
+
+  /**
+  * Store reviews.
+  */
+  static storeReviews(reviews) {
+    return DBHelper.dbPromise().then(idb => {
+      const tx = idb.transaction('reviews', 'readwrite');
+      const revStore = tx.objectStore('reviews');
+      return Promise.all(reviews.map(review => revStore.put(review)))
+        .catch(() => {
+          tx.abort();
+        });
+    });
+  }
+
+  /**
+  * Fetch reviews.
+  */
+  static fetchReviews() {
+    return DBHelper.dbPromise().then(idb => {
+      const tx = idb.transaction('reviews', 'readonly');
+      const revStore = tx.objectStore('reviews');
+      return revStore.getAll();
+    });
+  }
+
+  /**
+  * Fetch reviews by id.
+  */
+  static fetchReviewsById(id, callback) {
+    const url = `${DBHelper.REVIEWS_URL}/?restaurant_id=${id}`;
+
+    fetch(url).then(response => {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          return response.json();
+        } else {
+          throw new TypeError('Error: no json.');
+        }
+      }).then(json => {
+        const reviews = json;
+        DBHelper.storeReviews(reviews);
+        callback(null, reviews);
+      }).catch(error => {
+        this.fetchReviews().then(data => {
+          const revID = [];
+          const reviews = data;
+          reviews.forEach(rev => {
+            if (rev.restaurant_id === id) {
+              revID.push(rev);
+            }
+          });
+          if (revID.length > 0) {
+            callback(null, revID);
+          } else {
+            callback('No Reviews', null);
+          }
+        });
+        console.log('Something went wrong: ' + error);
+      });
+  }
 }

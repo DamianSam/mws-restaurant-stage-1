@@ -45,6 +45,30 @@
     </section>
     <!-- End map -->
     <!-- Beginning reviews -->
+    <section id="reviews-form-container">
+      <h2 id="form-heading">Leave a Review</h2>
+      <form method="post" enctype="multipart/form-data" name="review-form" class="review-form" id="review-form">
+        <div class="fields">
+          <label for="form-name">Your Name</label>
+          <input type="text" name="Name" id="form-name" required>
+        </div>
+        <div class="fields">
+          <label for="form-rating">Your Rating</label>
+          <select name="Rating" id="form-rating"required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+        <div class="fields">
+          <label for="form-review-content">Share your thoughts</label>
+          <textarea name="form-review-content" id="form-review-content" required></textarea>
+        </div>
+        <button type="submit" aria-label="Submit" class="form-submit">Send</button>
+      </form>
+    </section>
     <section id="reviews-container">
       <ul id="reviews-list"></ul>
     </section>
